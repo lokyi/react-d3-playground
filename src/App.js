@@ -89,7 +89,7 @@ class App extends Component {
         // pass the score through the linear scale function 
         return xScale(d[this.state.subject]) + 'px'
       })
-      .style('height', d => yScale.bandwidth() - 2.5 + 'px')
+      .style('height', d => yScale.bandwidth() - 2 + 'px')
   }
 }
 
