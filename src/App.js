@@ -10,6 +10,18 @@ const data = [
   { name: 'David', math: 64, science: 76 },
   { name: 'Emily', math: 80, science: 94 }
 ]
+// specify chart dimensions 
+const width = 400
+const height = 200
+// create a scale to map scores to bar widths 
+// test scores are stored as percentages 
+// a score of 100 should create a full-width bar 
+const xScale = d3.scaleLinear()
+  .domain([0, 100])
+  .range([0, width])
+const yScale = d3.scaleBand()
+  .domain(data.map(function (d) { return d.name }))
+  .range([0, height])
 
 class App extends Component {
   state = { subject: 'math' }
@@ -29,26 +41,12 @@ class App extends Component {
     this.draw()
   }
   componentDidUpdate() {
-    // d3.select('#chart') // within the #chart container... 
-    //   .selectAll('div') // select all the divs 
-    //   .remove()         // and remove them, clearing the #chart div 
     this.draw()
   }
   handleClick = (subject) => {
     this.setState({ subject })
   }
   draw = () => {
-    // d3.select('#chart')
-    //   .selectAll('div')
-    //   .data(data, d => d.name) // pair each number in the array with an empty div 
-    //   .enter()
-    //   .append('div')
-    //   .attr('class', 'bar') // color, height, and spacing via CSS 
-    //   .transition() // animate everything that comes after this line! 
-    //   .style('width', d => {
-    //     return d[this.state.subject] + 'px' // use the subject passed in to grab the correct property  
-    //   })
-    
     // store a reference to the bars already on the chart 
     const bars = d3.select('#chart')
       .selectAll('div') // this won't be empty after the first time this function runs 
@@ -68,6 +66,11 @@ class App extends Component {
       .style('width', d => {
         return d[this.state.subject] + 'px' // set the width like normal! 
       })
+      .style('width', d => {
+        // pass the score through the linear scale function 
+        return xScale(d[this.state.subject]) + 'px'
+      })
+      .style('height', d => yScale.bandwidth() + 'px')
   }
 }
 
