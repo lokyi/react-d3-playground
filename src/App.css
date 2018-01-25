@@ -17,6 +17,11 @@
   font-size: large;
 }
 
+#chart {
+  padding: 10px 10px 20px 50px;
+  text-align: initial;
+}
+
 .bar {
   background-color: teal;
   height: 20px;
