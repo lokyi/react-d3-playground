@@ -15,15 +15,17 @@ const margin = { top: 10, right: 10, bottom: 20, left: 50 }
 const width = 600 - margin.left - margin.right
 const height = 400 - margin.top - margin.bottom
 
-// create a scale to map scores to bar widths 
-// test scores are stored as percentages 
-// a score of 100 should create a full-width bar 
-const xScale = d3.scaleLinear()
-  .domain([0, 100])
+// the band scale is now our x scale 
+// since we want to set column width based on the number of bands 
+const xScale = d3.scaleBand()
+  .domain(data.map( d => d.name ))
   .range([0, width])
-const yScale = d3.scaleBand()
-  .domain(data.map(function (d) { return d.name }))
-  .range([0, height])
+
+// the linear scale is our y scale now 
+const yScale = d3.scaleLinear()
+  .domain([0, 100])
+  .range([height, 0])
+
 
 class App extends Component {
   state = { subject: 'math' }
@@ -76,20 +78,23 @@ class App extends Component {
     const newBars = bars.enter() // use the enter selection 
       .append('div') // to add new bars for any data items without an existing DOM element 
       .attr('class', 'bar')
-      .style('width', 0) // set the initial width to 0 
+      .style('width', d => {
+        // set the initial width to band widths
+        return xScale.bandwidth() - 2 + 'px'
+      })
+      .style('height', 0) // columns initially have no height
+      .style('margin-top', height + 'px')  
       
     // combine the selections of new and existing bars 
     // so you can act on them together 
     newBars.merge(bars)
       .transition() // animate everything that comes after this line! 
-      .style('width', d => {
-        return d[this.state.subject] + 'px' // set the width like normal! 
+      .style('height', d => {
+        return (height - yScale(d[this.state.subject])) + 'px'
       })
-      .style('width', d => {
-        // pass the score through the linear scale function 
-        return xScale(d[this.state.subject]) + 'px'
+      .style('margin-top', d => {
+        return yScale(d[this.state.subject]) + 'px'
       })
-      .style('height', d => yScale.bandwidth() - 2 + 'px')
   }
 }
 
